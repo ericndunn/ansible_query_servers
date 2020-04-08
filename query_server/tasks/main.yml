@@ -1,0 +1,3 @@
+---
+# tasks file for compare_server
+- include_tasks: retrieve_git_version.yml

@@ -1,0 +1,6 @@
+---
+- hosts: "all"
+  gather_facts: true
+  roles: [query_server]
+  vars: 
+  vars_files: [query_server/vars/main.yml] 
