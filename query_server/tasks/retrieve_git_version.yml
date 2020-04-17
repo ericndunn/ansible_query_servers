@@ -1,20 +1,32 @@
-# - setup:
-#   register: my_setup
-# - debug:
-#     msg: "{{ my_setup }}"
+#- setup:
+#  register: my_setup
+#- debug:
+#    msg: "{{ my_setup }}"
 
-- name: Gather the rpm package facts
-  package_facts:
-    manager: auto
+- name: check for existing git install
+  stat:
+    path: "{{ path_to_git }}"
+  register: result_a
+  tags: git
 
-# - name: Print the rpm package facts
-#   debug:
-#     var: ansible_facts.packages
+#- name: debug check for existing git install
+#  debug:
+#    msg: "{{ result_a }}"
 
-- name: "Get all GIT packages"
+- name: check git version
+  command: "{{ path_to_git }} --version"
+  register: result_b
+  when: "result_a.stat.exists"
+  changed_when: False
+  failed_when: False
+  tags: git
+
+- name: debug check git version
   debug:
-    msg: "{{ item }}
-    Version: {{ ansible_facts.packages[item][0]['version'] }}
-    Release: {{ ansible_facts.packages[item][0]['release'] }}"
-  loop: "{{ ansible_facts.packages | list | select('match', 'git') | list }}"
+    msg: "{{ result_b.stdout_lines }}"
 
+- name: check to see if variable matches installed version of git
+  debug:
+    msg: "DESCREPANCY: Variable is set to {{ git_target_version }} (SEE vars/main.yml). INSTALLED version git {{ result_b.stdout_lines }} installed on {{ ansible_host }}."
+  when: "not result_a.stat.exists or git_target_version is not defined or git_target_version not in result_b.stdout"
+  tags: git
