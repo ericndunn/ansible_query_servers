@@ -1,7 +1,7 @@
-#- setup:
-#  register: my_setup
-#- debug:
-#    msg: "{{ my_setup }}"
+- setup:
+  register: my_setup
+- debug:
+    msg: "{{ my_setup }}"
 
 - name: check for existing git install
   stat:
